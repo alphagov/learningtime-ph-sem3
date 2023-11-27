@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+
+  lint-ruby:
+    name: Lint Ruby
+    uses: alphagov/govuk-infrastructure/.github/workflows/rubocop.yml@main
+  
+  test-ruby:
+    name: Test Ruby
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Setup MySQL --> look at gov.uk repo for PSQL equivalent, ie.: publishing-api
+      #   id: setup-mysql
+      #   uses: alphagov/govuk-infrastructure/.github/actions/setup-mysql@main
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # - name: Initialize database -> either scrap, or apply to PSQL
+      #   env:
+      #     RAILS_ENV: test
+      #     TEST_DATABASE_URL: ${{ steps.setup-mysql.outputs.db-url }}
+      #   run: bundle exec rails db:setup
+
+      - name: Run Rspec
+        # env:
+        #   RAILS_ENV: test
+        #   TEST_DATABASE_URL: ${{ steps.setup-mysql.outputs.db-url }}
+        run: bundle exec rspec
